@@ -18,5 +18,10 @@ async function createNewOffice(driver){
 async function createNewuser(driver){
     lib.clikId(driver,fPLocs.createUser);
 }
+async function usersManag(driver){
+    lib.clikId(driver,fPLocs.userManag);
+}
 
-module.exports={fPLocs,createNewOffice,createNewuser}
+
+module.exports={fPLocs,createNewOffice,createNewuser,
+    usersManag}

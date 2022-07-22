@@ -4,7 +4,12 @@ async function setField(driver,field,inp){
     await erase(driver,field);
     await driver.findElement(By.id(field)).sendKeys(inp);  
 }
-
+async function setFieldCss(driver,field,inp){
+    const {Builder, By, Key, until}= require("selenium-webdriver");
+    await driver.findElement(By.css(field)).click();
+    await erase(driver,field);
+    await driver.findElement(By.css(field)).sendKeys(inp);  
+}
 async function clikId(driver,field){
     const {Builder, By, Key, until}= require("selenium-webdriver");
     await driver.findElement(By.id(field)).click();    
@@ -131,5 +136,5 @@ async function fieldEnabledXpath(driver,tag){
 module.exports={getTextClassName,isEnabledBtnCss,getTextXpath,fieldEnabledXpath,
     fieldEnabled,btnEnabled,isVisible1,isVisible,isEnabledField,isEnabledBtn,
     getTextId,clikCss,clikId,clikXpath,setField,erase,getValueCss,getValueId,
-    isEnabledBtnClassName,clikClassName
+    isEnabledBtnClassName,clikClassName,setFieldCss
 }

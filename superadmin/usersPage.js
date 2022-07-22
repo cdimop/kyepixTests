@@ -69,6 +69,8 @@ const { nuLoc } = require("./newUserPage");
   }
   
   async function checkSearchField(driver,lName,office,role,status){
+    const {Builder, By, Key, until}= require("selenium-webdriver"); 
+    let temp=false;
     //title
     temp1=await lib.getValueCss(driver,usersLocs.u_searchTitle);
     await temp1.should.equal('Κριτήρια Αναζήτησης');
@@ -82,18 +84,11 @@ const { nuLoc } = require("./newUserPage");
     await temp1.should.equal('Γραφείο ΚΥΕΠΙΧ');
     temp1=await lib.getValueCss(driver,usersLocs.u_searchOffice);
     await temp1.should.equal(office);
-    
     //role
-    temp1=await lib.getValueCss(driver,usersLocs.u_searchRoleTitle);
-    await temp1.should.equal('Ρόλοι');
-    temp1=await lib.getValueCss(driver,usersLocs.u_searchRole);
-    await temp1.should.equal(role);
+    await checkSearchRole(driver,role);
     //status
-    temp1=await lib.getValueCss(driver,usersLocs.u_searchStatusTitle);
-    await temp1.should.equal('Κατάσταση');
-    temp1=await lib.getValueCss(driver,usersLocs.u_searchStatus);
-    await temp1.should.equal(status);
-
+    await checkSearchStatus(driver,status);  
+  
     //search btn
     temp1=await lib.getValueCss(driver,usersLocs.u_searchBtn);
     await temp1.should.equal('Αναζήτηση');
@@ -101,11 +96,130 @@ const { nuLoc } = require("./newUserPage");
 
   }
 
+  async function checkSearchRole(driver,value){ 
+    const {Builder, By, Key, until}= require("selenium-webdriver"); 
+
+    //check field title 
+    temp1=await lib.getValueCss(driver,usersLocs.u_searchRoleTitle);
+    await temp1.should.equal('Ρόλοι');
+    //check the options
+    await lib.clikCss(driver,usersLocs.u_searchRole);
+    temp1=await driver.findElement(By.id('menu-roles'));
+    temp2=await temp1.findElements(By.className('MuiMenuItem-root MuiMenuItem-gutters'));
+    temp3=await checkInListbox(driver,temp2,'Όλοι');
+    await temp3.should.equal(true);
+    temp3=await checkInListbox(driver,temp2,'Προϊστάμενος');
+    await temp3.should.equal(true);
+    temp3=await checkInListbox(driver,temp2,'Υπάλληλος');
+    await temp3.should.equal(true);
+    temp=0;
+    for(temp3 of temp2){
+      temp=temp+1;
+    }
+    await temp.should.equal(3);
+    await driver.findElement(By.tagName('body')).sendKeys(Key.ESCAPE);
+    //check the field value
+    temp1=await lib.getValueCss(driver,usersLocs.u_searchRole);
+    await temp1.should.equal(value);
+  }
+
+  async function checkSearchStatus(driver,value){
+    const {Builder, By, Key, until}= require("selenium-webdriver"); 
+    await driver.sleep(500);
+    temp1=await lib.getValueCss(driver,usersLocs.u_searchStatusTitle);
+    await temp1.should.equal('Κατάσταση');
+    //check the options
+    await lib.clikCss(driver,usersLocs.u_searchStatus);
+    temp1=await driver.findElement(By.id('menu-enabled'));
+    temp2=await temp1.findElements(By.className('MuiMenuItem-root MuiMenuItem-gutters'));
+    temp3=await checkInListbox(driver,temp2,'Όλες');
+    await temp3.should.equal(true);
+    temp3=await checkInListbox(driver,temp2,'Ενεργός');
+    await temp3.should.equal(true);
+    temp3=await checkInListbox(driver,temp2,'Ανενεργός');
+    await temp3.should.equal(true);
+    //check that the options are 3
+    temp=0;
+    for(temp3 of temp2){
+      temp=temp+1;
+    }
+    await temp.should.equal(3);
+
+
+    await driver.findElement(By.tagName('body')).sendKeys(Key.ESCAPE);
+    //check the field value 
+    temp1=await lib.getValueCss(driver,usersLocs.u_searchStatus);
+    await temp1.should.equal(value);
+  }
+
+  async function checkInListbox(driver,listbox,value){
+    let tmp,tmp1;
+    for(tmp of listbox){
+      tmp1=await tmp.getText();
+      if(tmp1==value){
+        return true;        
+      }
+    }
+    return false;
+  }
+
   //input. for no inp:name:'',off:null,rol:'Όλοι',stat:'Ολες'
-  async function setSearchField(driver,fname,off,rol,stat){
-    
+  async function setSearchField(driver,lname,off,rol,stat){
+    const {Builder, By, Key, until}= require("selenium-webdriver"); 
+    //lName 
+    await lib.setFieldCss(driver,usersLocs.u_searchLName,lname);
+    //set office
+    await lib.clikCss(driver,usersLocs.u_searchOffice);
+    temp1= await driver.findElement(By.id('kyepix_office_id-listbox'));
+    temp2=await temp1.findElements(By.className('MuiAutocomplete-option'));
+    if(off==null){
+      temp3=await lib.getValueCss(driver,usersLocs.u_searchOffice);
+      if(temp3!=''){
+        
+        for (temp3 of temp2){
+          temp4=await temp3.getText();
+          if(temp4==off){
+            await temp3.click();
+            break;
+          }
+        }
+      }
+    };
+
+    //set role
+    await lib.clikCss(driver,usersLocs.u_searchRole);
+    temp1= await driver.findElement(By.id('menu-roles'));
+    temp2=await temp1.findElements(By.className('MuiMenuItem-root MuiMenuItem-gutters'));
+    if(rol==null){
+      rol=='Όλοι';
+    };
+    for (temp3 of temp2){
+      temp4=await temp3.getText();
+      if(temp4==rol){
+        await temp3.click();
+        break;
+      }
+    }
+
+    //set status
+    await lib.clikCss(driver,usersLocs.u_searchStatus);
+    temp1= await driver.findElement(By.id('menu-enabled'));
+    temp2=await temp1.findElements(By.className('MuiMenuItem-root MuiMenuItem-gutters'));
+    if(stat==null){
+      stat=='Όλες';
+    };
+    for (temp3 of temp2){
+      temp4=await temp3.getText();
+      if(temp4==stat){
+        await temp3.click();
+        break;
+      }
+    }
+
+    await checkSearchField(driver,lname,off,rol,stat)
+
   }
   
   module.exports = { usersLocs, checkUserTab, checkTexts, checkSearchField, 
-    setSearchField};
+    setSearchField,checkInListbox,checkSearchRole,checkSearchStatus};
   

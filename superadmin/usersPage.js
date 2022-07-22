@@ -100,6 +100,12 @@ const { nuLoc } = require("./newUserPage");
     temp1=await lib.isEnabledBtnCss(driver,usersLocs.u_searchBtn)
 
   }
+
+  //input. for no inp:name:'',off:null,rol:'Όλοι',stat:'Ολες'
+  async function setSearchField(driver,fname,off,rol,stat){
+    
+  }
   
-  module.exports = { usersLocs, checkUserTab, checkTexts, checkSearchField };
+  module.exports = { usersLocs, checkUserTab, checkTexts, checkSearchField, 
+    setSearchField};
   
